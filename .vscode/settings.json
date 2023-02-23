@@ -1,0 +1,7 @@
+{
+  "python.analysis.typeCheckingMode": "basic",
+  "python.linting.flake8Args":[
+    "--max-line-length=1000",
+    "--extend-ignore=E231,E203,E117,E302,E225,E228,W291,E305,W191,W292,W391,F403,F405"
+  ]
+}
