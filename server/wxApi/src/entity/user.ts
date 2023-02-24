@@ -39,6 +39,7 @@ export class User {
     @IsPhoneNumber()
     address: string;
 
+    // 一对多的关系
     @OneToMany(() => Focus, focus => focus.user)
     focuss: Focus[]
 }

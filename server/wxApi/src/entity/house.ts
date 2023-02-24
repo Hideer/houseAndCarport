@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn } from "typeorm";
 import { Length, IsEmail } from "class-validator";
+import { Community } from "./community";
 
 @Entity()
 export class House {
@@ -14,6 +15,10 @@ export class House {
     // @Column({ length: 80 })
     // @Length(1,)
     // community_name: string;
+    // 一对一关系, 每个房子只关联一个小区
+    @OneToOne(() => Community)
+    @JoinColumn()
+    community: Community;
 
     @Column({ length: 80 })
     deal_time: string;

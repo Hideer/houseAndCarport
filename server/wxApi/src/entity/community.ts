@@ -26,7 +26,6 @@ export class Community {
     @Length(1, 40)
     name: string;
 
-
     @Column("simple-array")
     @ArrayNotEmpty()
     logo: string[];

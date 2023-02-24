@@ -1,5 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn } from "typeorm";
 import { Length, IsBoolean, ArrayNotEmpty } from "class-validator";
+import { Community } from "./community";
+
 
 export enum TradType {
   SALES = "sales", // 买/卖
@@ -17,6 +19,10 @@ export enum TradRole {
 export class Carport {
     @PrimaryGeneratedColumn()
     id: number;
+
+    @OneToOne(() => Community)
+    @JoinColumn()
+    community: Community;
 
     @Column({
         type: "enum",

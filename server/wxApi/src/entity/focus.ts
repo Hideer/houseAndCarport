@@ -31,12 +31,6 @@ export class Focus {
     @OneToOne(() => Community)
     @JoinColumn()
     community: Community;
-
-    // @Column()
-    // user_id: string;
-
-    // @Column()
-    // community_id: string;
 }
 
 export const userSchema = {
