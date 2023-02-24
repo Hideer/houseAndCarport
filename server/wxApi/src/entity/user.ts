@@ -20,9 +20,7 @@ export class User {
     @IsEmail()
     email: string;
 
-    @Column({
-        length: 20
-    })
+    @Column()
     @Length(8, 20)
     @IsPhoneNumber()
     phone: number;
@@ -42,7 +40,7 @@ export class User {
     address: string;
 
     @OneToMany(() => Focus, focus => focus.user)
-    focus: Focus[]
+    focuss: Focus[]
 }
 
 export const userSchema = {

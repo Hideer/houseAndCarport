@@ -24,7 +24,7 @@ export class Focus {
     type: FocusType;
 
     // 多对一关系，多个关注对应一个用户
-    @ManyToOne(() => User, user => user.focus)
+    @ManyToOne(() => User, user => user.focuss)
     user: User;
 
     // 一对一关系, 每个关注都有一个小区

@@ -21,7 +21,6 @@ export class Carport {
     @Column({
         type: "enum",
         enum: TradType,
-        length: 80
     })
     @Length(1,)
     type: TradType;
@@ -30,7 +29,6 @@ export class Carport {
         type: "enum",
         enum: TradRole,
         default: TradRole.BUYER,
-        length: 80
     })
     @Length(1,)
     trad_role: TradRole;

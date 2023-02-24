@@ -4,7 +4,7 @@ import bodyParser from "koa-bodyparser";
 import helmet from "koa-helmet";
 import cors from "@koa/cors";
 import winston from "winston";
-import { createConnection, ConnectionOptions } from "typeorm";
+import { createConnection, ConnectionOptions} from "typeorm";
 import "reflect-metadata";
 
 import { logger } from "./logger";
@@ -19,7 +19,9 @@ const connectionOptions: ConnectionOptions = {
     port: 3306,
     username: "root",
     password: "123456",
-    database: "wx_duck"
+    database: "wx_duck",
+    // synchronize: true,  // 初始化数据库，慎放开
+    // entities: [__dirname + "/entity/*.ts"],
 };
 
 // create connection with database
@@ -54,7 +56,7 @@ createConnection(connectionOptions).then(async () => {
 
     // JWT middleware -> below this line routes are only reached if JWT token is valid, secret as env variable
     // do not protect swagger-json and swagger-html endpoints
-    app.use(jwt({ secret: config.jwtSecret }).unless({ path: [/^\/swagger-/] }));
+    app.use(jwt({ secret: config.jwtSecret, cookie: "token", debug: true }).unless({ path: [/^\/swagger-/] }));
 
     // These routes are protected by the JWT middleware, also include middleware to respond with "Method Not Allowed - 405".
     app.use(protectedRouter.routes()).use(protectedRouter.allowedMethods());
