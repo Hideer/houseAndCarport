@@ -67,10 +67,13 @@ def get_chinese_city(en):
     return cities.get(en, None)
 
 
-def get_city():
-    city = None
+def get_city(en):
+    city = en or None
+    # 允许方法默认值
+    if city:
+        city = en
     # 允许用户通过命令直接指定
-    if len(sys.argv) < 2:
+    elif len(sys.argv) < 2:
         print("Wait for your choice.")
         # 让用户选择爬取哪个城市的二手房小区价格数据
         prompt = create_prompt_text()

@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, ManyToOne } from "typeorm";
+import { Entity, Column, CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn, OneToOne, JoinColumn, ManyToOne,OneToMany } from "typeorm";
 import { Length, IsEmail, length } from "class-validator";
 import { User } from "./user";
 import { Community } from "./community";
@@ -18,7 +18,8 @@ export class Focus {
     @Column({
         type: "enum",
         enum: FocusType,
-        default: FocusType.HOUSE
+        default: FocusType.HOUSE,
+        comment: '关注类型',
     })
     @Length(10, 80)
     type: FocusType;
@@ -27,10 +28,14 @@ export class Focus {
     @ManyToOne(() => User, user => user.focuss)
     user: User;
 
-    // 一对一关系, 每个关注都有一个小区
-    @OneToOne(() => Community)
-    @JoinColumn()
+    @ManyToOne(() => Community, community => community.id)
     community: Community;
+
+    @CreateDateColumn()
+    created_at: Date;
+
+    @UpdateDateColumn()
+    updated_at: Date;
 }
 
 export const userSchema = {

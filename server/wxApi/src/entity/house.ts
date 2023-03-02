@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn } from "typeorm";
+import { Entity, Column, CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn, ManyToOne, OneToOne, JoinColumn } from "typeorm";
 import { Length, IsEmail } from "class-validator";
 import { Community } from "./community";
 
@@ -7,68 +7,143 @@ export class House {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ length: 80 })
+    @Column({
+        length: 80,
+        comment: '数据收集日期',
+    })
+    @Length(1,)
+    collection_date: string;
+
+    @Column({
+        length: 80,
+        comment: '小区编码',
+    })
     @Length(1,)
     code: string;
+
+    @Column({
+        length: 80,
+        nullable: true,
+        comment: '成交周期',
+    })
+    deal_time: string;
+
+    @Column({
+        length: 80,
+        nullable: true,
+        comment: '成交日期',
+    })
+    @Length(1,)
+    deal_date: string;
+
+    @Column({
+        length: 80,
+        nullable: true,
+        comment: '户型',
+    })
+    @Length(1,)
+    door_model: string;
+
+    @Column({
+        length: 1000,
+        nullable: true,
+        comment: '户型图',
+    })
+    door_model_img: string;
+
+    @Column({
+        length: 1000,
+        comment: '详情地址',
+    })
+    desc_url: string;
+
+    @Column({
+        length: 80,
+        comment: '面积',
+    })
+    size: string;
+
+    @Column({
+        length: 80,
+        nullable: true,
+        comment: '挂牌价格',
+    })
+    @Length(1,)
+    original_price: string;
+
+    @Column({
+        length: 80,
+        comment: '成交价格',
+    })
+    @Length(1,)
+    real_price: string;
+
+    @Column({
+        length: 80,
+        nullable: true,
+        comment: '成交单价',
+    })
+    @Length(1,)
+    unit_price: string;
+
+    @Column({
+        length: 80,
+        nullable: true,
+        comment: '朝向',
+    })
+    @Length(1,)
+    toward: string;
+
+    @Column({
+        length: 80,
+        nullable: true,
+        comment: '装修情况',
+    })
+    @Length(1,)
+    decorate_situation: string;
+
+    @Column({
+        length: 80,
+        nullable: true,
+        comment: '楼层',
+    })
+    @Length(1,)
+    high: string;
+
+    @Column({
+        length: 80,
+        nullable: true,
+        comment: '房屋构造',
+    })
+    structure: string;
+
+    @Column({
+        length: 80,
+        nullable: true,
+        comment: '是否满五满二',
+    })
+    tax_status: string;
+
+    @Column({
+        length: 80,
+        nullable: true,
+        comment: '最近交通',
+    })
+    recently_subway: string;
 
     // TODO: 是否关联小区,关联小区需要清洗数据
     // @Column({ length: 80 })
     // @Length(1,)
     // community_name: string;
-    // 一对一关系, 每个房子只关联一个小区
-    @OneToOne(() => Community)
-    @JoinColumn()
+    // 一对多关系, 小区有多个房子
+    @ManyToOne(() => Community, community => community.id)
     community: Community;
 
-    @Column({ length: 80 })
-    deal_time: string;
+    @CreateDateColumn()
+    created_at: Date;
 
-    @Column({ length: 80 })
-    @Length(1,)
-    deal_date: string;
-
-    @Column({ length: 80 })
-    @Length(1,)
-    door_model: string;
-
-    @Column({ length: 100 })
-    door_model_img: string;
-
-    @Column({ length: 80 })
-    size: string;
-
-    @Column({ length: 80 })
-    @Length(1,)
-    original_price: string;
-
-    @Column({ length: 80 })
-    @Length(1,)
-    real_price: string;
-
-    @Column({ length: 80 })
-    @Length(1,)
-    unit_price: string;
-
-    @Column({ length: 80 })
-    @Length(1,)
-    toward: string;
-
-    @Column({ length: 80 })
-    @Length(1,)
-    decorate_situation: string;
-
-    @Column({ length: 80 })
-    @Length(1,)
-    high: string;
-
-    @Column({ length: 80 })
-    structure: string;
-
-    @Column({ length: 80 })
-    tax_status: string;
-
-    @Column({ length: 80 })
-    recently_subway: string;
+    @UpdateDateColumn()
+    updated_at: Date;
 }
 
 export const userSchema = {
@@ -84,6 +159,7 @@ export const userSchema = {
     deal_date: { type: "string", required: true, example: "2011-12-12" }, // 成交日期
     door_model: { type: "string", required: true, example: "几室几厅" },
     door_model_img: { type: "string", required: false, example: "户型图片" },
+    desc_url:{ type: "string", required: false, example: "详情页url" },
     size: { type: "string", required: false, example: "136平方米" },
     original_price: { type: "string", required: true, example: "1000万" },
     real_price: { type: "string", required: true, example: "890万" },

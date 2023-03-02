@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm";
+import { Entity, Column, CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn, OneToMany } from "typeorm";
 import { Length, IsEmail, IsPhoneNumber } from "class-validator";
 import { Focus } from "./focus";
 
@@ -8,40 +8,59 @@ export class User {
     id: number;
 
     @Column({
-        length: 80
+        type: 'varchar',
+        length: 80,
+        comment: '用户名',
     })
     @Length(10, 80)
     name: string;
 
     @Column({
-        length: 100
+        type: 'varchar',
+        length: 100,
+        nullable: true,
+        comment: '用户邮箱',
     })
     @Length(10, 100)
     @IsEmail()
     email: string;
 
-    @Column()
-    @Length(8, 20)
+    @Column({
+        type: 'int',
+        nullable: true,
+        comment: '用户手机',
+    })
+    @Length(11)
     @IsPhoneNumber()
     phone: number;
 
     @Column({
-        length: 20
+        type: 'varchar',
+        length: 100,
+        comment: '微信token',
     })
-    @Length(8, 20)
+    @Length(8, 100)
     @IsPhoneNumber()
     access_token: string;
 
     @Column({
-        length: 20
+        length: 100,
+        nullable: true,
+        comment: '用户地址',
     })
-    @Length(8, 20)
+    @Length(8, 100)
     @IsPhoneNumber()
     address: string;
 
     // 一对多的关系
     @OneToMany(() => Focus, focus => focus.user)
-    focuss: Focus[]
+    focuss: Focus[];
+
+    @CreateDateColumn()
+    created_at: Date;
+
+    @UpdateDateColumn()
+    updated_at: Date;
 }
 
 export const userSchema = {

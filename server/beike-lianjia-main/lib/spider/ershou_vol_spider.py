@@ -42,7 +42,7 @@ class ErShouVolSpider(BaseSpider):
                 for ershou in ershous:
                     # print(date_string + "," + xiaoqu.text())
                     f.write(self.date_string + "," + ershou.text() + "\n")
-        time.sleep(random.randint(1, 30))
+        time.sleep(random.randint(1, 6))
         print("Finish crawl area: " + area_name + ", save data to : " + csv_file)
 
     @staticmethod
@@ -106,25 +106,35 @@ class ErShouVolSpider(BaseSpider):
 
                     # 继续清理数据
                     desc_url = desc_url.get('href','').strip()
-                    name = name.text.replace("\n", "")
+                    name = re.sub(r" +",' ', name.text.replace("\n", "").strip()).replace(",", "-")
                     price = re.sub(r" +",' ', price.text.replace("\n", "").strip())
                     date = date.text.strip()
                     unit_price = re.sub(r" +",' ', unit_price.text.replace("\n", "").strip())
                     # pic 标签可能不存在
                     pic = pic.get('data-original','').strip() if pic else ''
                     desc_info = desc_info.text.replace("\n", "").strip()
-                    desc_position = desc_position.text.replace("\n", "").strip()
+                    desc_position = re.sub(r" +",' ', desc_position.text.replace("\n", "").strip())
                     trade_mark = str(desc_url.split('/')[-1].replace(".html",""))
                     desc_tax = ''
                     desc_dist = ''
                     desc_cycle = ''
                     desc_original_price = ''
                     if desc_deal_house:
-                        desc_tax = desc_deal_house[0].text.strip() if len(desc_deal_house)>1 else ''
-                        desc_dist = desc_deal_house[1].text.strip() if len(desc_deal_house)>1 else desc_deal_house[0].text.strip()
+                        if len(desc_deal_house)>1:
+                            desc_tax = desc_deal_house[0].text.strip()
+                            desc_dist = desc_deal_house[1].text.strip()
+                        elif '房屋' in desc_deal_house[0].text:
+                            desc_tax = desc_deal_house[0].text.strip()
+                        else:
+                            desc_dist = desc_deal_house[0].text.strip()
                     if desc_deal_cycle:
-                        desc_cycle = desc_deal_cycle[1].text.strip() if len(desc_deal_cycle)>1 else desc_deal_cycle[0].text.strip()
-                        desc_original_price = desc_deal_cycle[0].text.strip() if len(desc_deal_cycle)>1 else ''
+                        if len(desc_deal_cycle)>1:
+                            desc_original_price = desc_deal_cycle[0].text.strip()
+                            desc_cycle = desc_deal_cycle[1].text.strip()
+                        elif '挂牌' in desc_deal_cycle[0].text:
+                            desc_original_price = desc_deal_cycle[0].text.strip()
+                        else:
+                            desc_cycle = desc_deal_cycle[0].text.strip()
 
                     # 作为对象保存
                     ershou = ChengJiao(chinese_district, chinese_area, name, price, date, unit_price, desc_url, pic, trade_mark, desc_info, desc_position,desc_tax, desc_dist, desc_cycle, desc_original_price)

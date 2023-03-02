@@ -1,34 +1,71 @@
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, Column, CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn, OneToMany, ManyToOne } from "typeorm";
 import { Length, ArrayNotEmpty } from "class-validator";
+import { House } from "./house";
+import { Focus } from "./focus";
+
+
 
 @Entity()
 export class Community {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ length: 80 })
-    @Length(1, 20)
+    @Column({
+        length: 80,
+        nullable: true,
+        comment: '省',
+    })
     province: string;
 
-    @Column({ length: 80 })
+    @Column({
+        length: 80,
+        comment: '市',
+    })
     @Length(1, 20)
     city: string;
 
-    @Column({ length: 80 })
+    @Column({
+        length: 80,
+        comment: '区域',
+    })
     @Length(1, 20)
     district: string;
 
-    @Column({ length: 80 })
+    @Column({
+        length: 80,
+        nullable: true,
+        comment: '板块',
+    })
     @Length(1, 20)
     area: string;
 
-    @Column({ length: 80 })
+    @Column({
+        length: 80,
+        comment: '小区名称',
+    })
     @Length(1, 40)
     name: string;
 
-    @Column("simple-array")
+    @Column({
+        type: "simple-array",
+        nullable: true,
+        comment: '小区图集',
+    })
     @ArrayNotEmpty()
     logo: string[];
+
+    // 一对多的关系
+    @OneToMany(() => House, house => house.id)
+    house: House
+
+    @OneToMany(() => Focus, focus => focus.id)
+    focus: Focus;
+
+    @CreateDateColumn()
+    created_at: Date;
+
+    @UpdateDateColumn()
+    updated_at: Date;
 }
 
 // 小区表

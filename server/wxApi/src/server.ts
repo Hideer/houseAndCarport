@@ -20,8 +20,8 @@ const connectionOptions: ConnectionOptions = {
     username: "root",
     password: "123456",
     database: "wx_duck",
-    // synchronize: true,  // 初始化数据库，慎放开
-    // entities: [__dirname + "/entity/*.ts"],
+    synchronize: true,  // 初始化数据库，慎放开
+    entities: [__dirname + "/entity/*.ts"],
 };
 
 // create connection with database

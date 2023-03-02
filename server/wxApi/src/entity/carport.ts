@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn } from "typeorm";
+import { Entity, Column, CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn, OneToOne, JoinColumn } from "typeorm";
 import { Length, IsBoolean, ArrayNotEmpty } from "class-validator";
 import { Community } from "./community";
 
@@ -27,6 +27,7 @@ export class Carport {
     @Column({
         type: "enum",
         enum: TradType,
+        comment: '发布类型',
     })
     @Length(1,)
     type: TradType;
@@ -35,32 +36,59 @@ export class Carport {
         type: "enum",
         enum: TradRole,
         default: TradRole.BUYER,
+        comment: '角色（买方卖方）',
     })
     @Length(1,)
     trad_role: TradRole;
 
-    @Column({length: 100})
+    @Column({
+        length: 100,
+        comment: '位置详情',
+    })
     @Length(1,)
     position: string
 
-    @Column({length: 100})
+    @Column({
+        length: 100,
+        nullable: true,
+        comment: '车位编号',
+    })
     position_no: string
 
-    @Column({length: 100})
+    @Column({
+        length: 100,
+        comment: '价格',
+    })
     @Length(1,)
     price: string
 
-    @Column({ default: false })
+    @Column({
+        default: false,
+        nullable: true,
+        comment: '是否有充电桩',
+    })
     @IsBoolean()
     is_charg: boolean
 
-    @Column()
+    @Column({
+        comment: '备注信息',
+    })
     @IsBoolean()
     remarks: string
 
-    @Column("simple-array")
+    @Column({
+        type: "simple-array",
+        nullable: true,
+        comment: '图片',
+    })
     @ArrayNotEmpty()
     images: string[]
+
+    @CreateDateColumn()
+    created_at: Date;
+
+    @UpdateDateColumn()
+    updated_at: Date;
 }
 
 // 车位表
