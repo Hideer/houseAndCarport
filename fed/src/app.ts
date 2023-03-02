@@ -2,14 +2,14 @@ import { Component } from 'react'
 import './app.scss'
 
 class App extends Component {
-  componentDidMount () {}
+   componentDidMount() { }
 
-  componentDidShow () {}
+   componentDidShow() { }
 
-  componentDidHide () {}
+   componentDidHide() { }
 
-  render() {
-    return this.props.children
-  }
+   render() {
+      return this.props.children
+   }
 }
 export default App
