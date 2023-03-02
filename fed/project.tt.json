@@ -1,0 +1,13 @@
+{
+  "miniprogramRoot": "./",
+  "projectname": "wx",
+  "description": "A front - end platform about second-hand housing transactions and parking transactions",
+  "appid": "touristappid",
+  "setting": {
+    "urlCheck": true,
+    "es6": false,
+    "postcss": false,
+    "minified": false
+  },
+  "compileType": "miniprogram"
+}
