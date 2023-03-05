@@ -7,11 +7,13 @@ import winston from "winston";
 import { createConnection, ConnectionOptions} from "typeorm";
 import "reflect-metadata";
 
+
 import { logger } from "./logger";
 import { config } from "./config";
 import { unprotectedRouter } from "./unprotectedRoutes";
 import { protectedRouter } from "./protectedRoutes";
 import { cron } from "./cron";
+import { routerResponse } from "./middleware/formatResponse";
 
 const connectionOptions: ConnectionOptions = {
     type: "mysql",
@@ -20,8 +22,8 @@ const connectionOptions: ConnectionOptions = {
     username: "root",
     password: "123456",
     database: "wx_duck",
-    synchronize: true,  // 初始化数据库，慎放开
     entities: [__dirname + "/entity/*.ts"],
+    // synchronize: true,  // 初始化数据库，慎放开
 };
 
 // create connection with database
@@ -41,6 +43,10 @@ createConnection(connectionOptions).then(async () => {
           imgSrc:["'self'", "data:", "online.swagger.io", "validator.swagger.io"]
         }
     }));
+
+
+    // 格式化数据输出结构middleware
+    app.use(routerResponse());
 
     // Enable cors with default options
     app.use(cors());

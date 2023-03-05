@@ -146,7 +146,7 @@ export class House {
     updated_at: Date;
 }
 
-export const userSchema = {
+export const houseSchema = {
     id: { type: "number", required: true, example: 1 },
 
     community_name: { type: "string", required: true, example: "Javier" }, // 小区名字community

@@ -1,0 +1,40 @@
+.popup-wrap{
+  transition: height 0.3s ease-in-out;
+  .popup-btn-wrap{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 0 0;
+    .nut-animate{
+      line-height: 0;
+      & .nut-animate-flicker::after{
+        height: 4px;
+      }
+    }
+  }
+  .popup-btn{
+    height: 4px;
+    width: 40vw;
+    background-color: #fa2c19;
+    border-radius: 4px;
+  }
+  .tabs-wrap{
+    height: calc(100% - 70px);
+    .nut-tabpane{
+      padding: 8px 12px;
+    }
+    .nut-tabs__titles .nut-tabs__titles-item.active{
+      font-size: 16px;
+    }
+    .nut-tabs__content__wrap{
+      height: calc(100% - 46px);
+    }
+    .nut-tabs__content{
+      height: 100%;
+    }
+  }
+  .show-more-wrap{
+    display: flex;
+    justify-content: center;
+  }
+}

@@ -69,7 +69,7 @@ export class Community {
 }
 
 // 小区表
-export const userSchema = {
+export const communitySchema = {
     id: { type: "number", required: true, example: 1 },
     province: { type: "string", required: true, example: "杭州" }, // 所属省份
     city: { type: "string", required: true, example: "杭州" }, // 所属城市

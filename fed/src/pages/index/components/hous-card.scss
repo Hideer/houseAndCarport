@@ -1,0 +1,26 @@
+.card-wrap.nut-card{
+  .nut-card__left{
+    height: 90px;
+    width: 90px;
+  }
+  .nut-price__decimal,.nut-price__symbol{
+    display: none;
+  }
+  .nut-price__integer{
+    font-size: 18px;
+  }
+  .nut-card__right__price{
+    margin-top: 4px;
+  }
+  .originTpl-price{
+    font-size: 14px;
+    > span{
+      padding-left: 6px;
+    }
+  }
+  .footerTpl-time{
+    font-size: 12px;
+    padding-top: 4px;
+    line-height: 1.5;
+  }
+}
