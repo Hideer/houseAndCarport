@@ -1,33 +1,42 @@
 .popup-wrap{
   transition: height 0.3s ease-in-out;
+  box-sizing: border-box;
   .popup-btn-wrap{
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 6px 0 0;
-    .nut-animate{
-      line-height: 0;
-      & .nut-animate-flicker::after{
-        height: 4px;
-      }
+    padding: 10px 0 0;
+    margin-bottom: -18px;
+    // .nut-animate{
+    //   line-height: 0;
+    //   & .nut-animate-flicker::after{
+    //     height: 5px;
+    //   }
+    // }
+    .icon-expand{
+      transform: rotate(180deg);
     }
   }
-  .popup-btn{
-    height: 4px;
-    width: 40vw;
-    background-color: #fa2c19;
-    border-radius: 4px;
-  }
+  // .popup-btn{
+  //   height: 5px;
+  //   width: 30vw;
+  //   background-color: #f55e50;
+  //   border-radius: 4px;
+  // }
   .tabs-wrap{
-    height: calc(100% - 70px);
+    // height: 100%;
+    height: calc(100% - 36px);
     .nut-tabpane{
       padding: 8px 12px;
     }
+    .nut-tabs__titles .nut-tabs__titles-item{
+      font-size: 15px;
+    }
     .nut-tabs__titles .nut-tabs__titles-item.active{
-      font-size: 16px;
+      font-size: 18px;
     }
     .nut-tabs__content__wrap{
-      height: calc(100% - 46px);
+      height: 100%;
     }
     .nut-tabs__content{
       height: 100%;

@@ -1,0 +1,18 @@
+.navigation-comp-wrap{
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  background-color: #FFF;
+  .content-wrap{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0 15px;
+
+    > span{
+      padding-left: 4px;
+      font-size: 16px;
+    }
+  }
+}
