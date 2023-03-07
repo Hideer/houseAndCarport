@@ -13,6 +13,8 @@ from lib.zone.city import *
 from lib.utility.date import *
 from lib.utility.version import PYTHON_3
 from lib.spider.base_spider import SPIDER_NAME
+from lib.oss.download_chenjiao_image import download_upload_oss
+from lib.oss.download_chenjiao_image import get_remote_path
 
 pymysql.install_as_MySQLdb()
 
@@ -261,6 +263,11 @@ if __name__ == '__main__':
             if row['code'] not in houseList:
                 sourceKey = ':' + row['city_ch'] + ':' + row['chinese_district'] + ':' + row['chinese_area'] + ':' + row['xiaoquName']
                 row['community_id'] = communityMap[sourceKey]
+
+                # 户型图上传oss
+                download_upload_oss(row['door_model_img'])
+                row['door_model_img'] = get_remote_path(row['door_model_img'])
+
                 # 删除废弃字段
                 del row['city_ch']
                 del row['chinese_district']

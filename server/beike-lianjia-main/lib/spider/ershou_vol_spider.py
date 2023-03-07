@@ -135,14 +135,13 @@ class ErShouVolSpider(BaseSpider):
                             desc_original_price = desc_deal_cycle[0].text.strip()
                         else:
                             desc_cycle = desc_deal_cycle[0].text.strip()
-
                     # 作为对象保存
                     ershou = ChengJiao(chinese_district, chinese_area, name, price, date, unit_price, desc_url, pic, trade_mark, desc_info, desc_position,desc_tax, desc_dist, desc_cycle, desc_original_price)
                     ershou_list.append(ershou)
         return ershou_list
 
     def start(self):
-        city = 'hz' or get_city()
+        city = get_city('hz')
         self.today_path = create_date_path("{0}/ershou_val".format(SPIDER_NAME), city, self.date_string)
 
         t1 = time.time()  # 开始计时
