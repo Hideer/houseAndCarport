@@ -9,4 +9,3 @@ from lib.spider.ershou_vol_spider import *
 if __name__ == "__main__":
     spider = ErShouVolSpider(SPIDER_NAME)
     spider.start()
-

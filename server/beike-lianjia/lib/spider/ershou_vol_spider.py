@@ -42,7 +42,7 @@ class ErShouVolSpider(BaseSpider):
                 for ershou in ershous:
                     # print(date_string + "," + xiaoqu.text())
                     f.write(self.date_string + "," + ershou.text() + "\n")
-        time.sleep(random.randint(1, 6))
+        time.sleep(random.randint(1, 10))
         print("Finish crawl area: " + area_name + ", save data to : " + csv_file)
 
     @staticmethod

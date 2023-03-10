@@ -3,6 +3,7 @@ import UserRoute from "./router/user";
 import CommunityRoute from "./router/community";
 import HouseRoute from "./router/house";
 import CarportRoute from "./router/carport";
+import TrendRoute from "./router/trend";
 
 const protectedRouter = new SwaggerRouter();
 
@@ -14,7 +15,8 @@ protectedRouter.use("/community", CommunityRoute.routes());
 protectedRouter.use("/house", HouseRoute.routes());
 // CARPORT ROUTE
 protectedRouter.use("/carport", CarportRoute.routes());
-
+// TREND ROUTE
+protectedRouter.use("/trend", TrendRoute.routes());
 
 // protectedRouter.get("/users", user.getUsers);
 // protectedRouter.get("/users/:id", user.getUser);

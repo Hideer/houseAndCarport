@@ -1,9 +1,12 @@
-import { Entity, Column, CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn, OneToMany, ManyToOne } from "typeorm";
+import { Entity, Column, CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn, OneToMany, ManyToOne, Index, Double } from "typeorm";
 import { Length, ArrayNotEmpty } from "class-validator";
 import { House } from "./house";
 import { Focus } from "./focus";
 
-
+export interface Geometry {
+    type: "Point"
+    coordinates: [number, number]
+}
 
 @Entity()
 export class Community {
@@ -45,6 +48,32 @@ export class Community {
     })
     @Length(1, 40)
     name: string;
+
+    // @Column({
+    //     type: 'geometry',
+    //     spatialFeatureType: 'Point',
+    //     comment: '坐标',
+    //     nullable: true,
+    // })
+    // @Index({ spatial: true })
+    // @Length(1, 100)
+    // xyz: Geometry;
+
+    @Column({
+        type: 'double',
+        nullable: true,
+        comment: '经度',
+    })
+    @ArrayNotEmpty()
+    lng: Double;
+
+    @Column({
+        type: 'double',
+        nullable: true,
+        comment: '维度',
+    })
+    @ArrayNotEmpty()
+    lat: Double;
 
     @Column({
         type: "simple-array",

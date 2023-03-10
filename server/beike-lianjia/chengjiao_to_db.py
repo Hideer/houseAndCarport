@@ -7,6 +7,7 @@
 
 import os
 import re
+import json
 import pymysql
 from lib.utility.path import DATA_PATH
 from lib.zone.city import *
@@ -15,6 +16,10 @@ from lib.utility.version import PYTHON_3
 from lib.spider.base_spider import SPIDER_NAME
 from lib.oss.download_chenjiao_image import download_upload_oss
 from lib.oss.download_chenjiao_image import get_remote_path
+from lib.map.map_api import address_to_location
+import threading
+import threadpool  
+
 
 pymysql.install_as_MySQLdb()
 
@@ -49,6 +54,8 @@ if __name__ == '__main__':
     workbook = None
     csv_file = None
     datas = list()
+    thread_xyz = 0
+    thread_upload = 0
 
     if database == "mysql":
         # import records
@@ -76,8 +83,8 @@ if __name__ == '__main__':
 
     city = get_city('hz')
     # 准备日期信息，爬到的数据存放到日期相关文件夹下
-    date = get_date_string()
-    # date = '20230228'
+    date = '20230307'
+    # date = get_date_string()
     # 获得 csv 文件路径
     # date = "20180331"   # 指定采集数据的日期
     # city = "sh"         # 指定采集数据的城市
@@ -86,8 +93,8 @@ if __name__ == '__main__':
 
     files = list()
     if not os.path.exists(csv_dir):
-        print("{0} does not exist.".format(csv_dir))
-        print("Please run 'python xiaoqu.py' firstly.")
+        print("{0} 不存在.".format(csv_dir))
+        print("请先执行 脚本 获取数据")
         print("Bye.")
         exit(0)
     else:
@@ -243,12 +250,19 @@ if __name__ == '__main__':
         for row in xiaoqu:
             sourceKey = row['province'] + ":" + row['city'] + ":" + row['district'] + ":" + row['area'] + ":" + row['name']
             if sourceKey not in communityMap:
+                # 地址解析
+                thread_xyz = thread_xyz + 1
+                if thread_xyz%5 == 0:
+                    time.sleep(1)
+                xyz = address_to_location(row['city'] + row['district'] + row['name'])
+                row['lng'] = xyz['lng']
+                row['lat'] = xyz['lat']
                 xiaoqu_await_inset.append(tuple(row.values()))
 
         # 写入新增的小区信息
         if len(xiaoqu_await_inset):
             community_count += len(xiaoqu_await_inset)
-            sql = "INSERT INTO community(province, city, district, area, name, logo) VALUES(%s,%s,%s,%s,%s,%s)"
+            sql = "INSERT INTO community(province, city, district, area, name, logo, lng, lat) VALUES(%s,%s,%s,%s,%s,%s,%s,%s)"
             cursor.executemany(sql,xiaoqu_await_inset)
             db.commit()
             firstInsertId = int(cursor.lastrowid)
@@ -259,15 +273,14 @@ if __name__ == '__main__':
 
         # 对比数据库获取新增房源数据
         house_await_inset = []
+        house_await_inset_img = []
         for row in fangyuan:
             if row['code'] not in houseList:
                 sourceKey = ':' + row['city_ch'] + ':' + row['chinese_district'] + ':' + row['chinese_area'] + ':' + row['xiaoquName']
                 row['community_id'] = communityMap[sourceKey]
-
-                # 户型图上传oss
-                download_upload_oss(row['door_model_img'])
-                row['door_model_img'] = get_remote_path(row['door_model_img'])
-
+                if row['door_model_img']: 
+                    house_await_inset_img.append(row['door_model_img'])
+                    row['door_model_img'] = get_remote_path(row['door_model_img'])
                 # 删除废弃字段
                 del row['city_ch']
                 del row['chinese_district']
@@ -277,6 +290,16 @@ if __name__ == '__main__':
 
         # 写入新增的房源信息
         if len(house_await_inset):
+            # 户型图上传oss
+            print('需上传图片数:',len(house_await_inset))
+            pool_size = 180 if len(house_await_inset_img) >=200 else len(house_await_inset_img)
+            pool = threadpool.ThreadPool(pool_size) 
+            requests = threadpool.makeRequests(download_upload_oss, house_await_inset_img) 
+            [pool.putRequest(req) for req in requests]
+            pool.wait()
+            pool.dismissWorkers(pool_size, do_join=True)  # 完成后退出
+            # download_upload_oss(row['door_model_img'])
+
             house_count += len(house_await_inset)
             sql = "INSERT INTO house(collection_date,code, deal_time,deal_date, door_model, door_model_img, desc_url, size, original_price, real_price, unit_price, toward, decorate_situation, high, structure, tax_status, recently_subway, communityId) values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
             cursor.executemany(sql, house_await_inset)

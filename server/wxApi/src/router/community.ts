@@ -4,8 +4,7 @@ import { community } from "./../controller";
 const router = new Router();
 
 router.get("/index", community.getCommunity);
-router.get("/signin", () => { });
-router.get("/signin-ok", () => { });
-router.get("/signin-failed", () => { });
+router.get("/distance", community.getCommunityByDistance);
+router.get("/:id", community.getCommunityDetail);
 
 export default router;

@@ -9,11 +9,11 @@ import { House, houseSchema } from "./../entity/house";
 export default class HouseController {
 
     @request("get", "/house/index")
-    @summary("Find all transaction second-hand house ")
+    @summary("查找所有二手成交房源并分页")
     public static async getHouses(ctx: Context): Promise<void> {
-        const { limit = 0, offset = 20 } = ctx.query;
-        const skip = Number(limit);
-        const take = Number(offset);
+        const { limit = 20, offset = 0 } = ctx.query;
+        const skip = Number(offset);
+        const take = Number(limit);
         const [list, total] = await getManager()
                                     .createQueryBuilder(House, "house")
                                     .orderBy({"house.deal_date": "DESC"})
@@ -41,11 +41,12 @@ export default class HouseController {
     }
 
     @request("get", "/house/distance")
-    @summary("Find house by distance")
+    @summary("按距离查找二手成交")
+    // TODO: 未实现
     public static async getHouseByDistance(ctx: Context): Promise<void> {
-        const { limit = 0, offset = 20 } = ctx.query;
-        const skip = Number(limit);
-        const take = Number(offset);
+        const { limit = 20, offset = 0 } = ctx.query;
+        const skip = Number(offset);
+        const take = Number(limit);
         const data = await getManager()
                             .createQueryBuilder(House, "house")
                             .orderBy({ "house.deal_date": "DESC" })
@@ -57,11 +58,11 @@ export default class HouseController {
     }
 
     @request("get", "/house/community")
-    @summary("Find house by community")
+    @summary("查询指定小区的二手成交房并分页")
     public static async getHouseByCommunity(ctx: Context): Promise<void> {
-        const { id, limit = 0, offset = 20 } = ctx.query;
-        const skip = Number(limit);
-        const take = Number(offset);
+        const { id, limit = 20, offset = 0 } = ctx.query;
+        const skip = Number(offset);
+        const take = Number(limit);
         const [list,total] = await getManager()
                     .createQueryBuilder(House, "house")
                     .where("house.communityId = :communityId", { communityId:id })
