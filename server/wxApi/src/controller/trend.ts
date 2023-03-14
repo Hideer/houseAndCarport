@@ -34,7 +34,13 @@ export default class TrendController {
     @summary("小区按月获取成交均价趋势")
     public static async getCommunityPrice(ctx: Context): Promise<void> {
         const { id  } = ctx.query;
-        const sql = "SELECT house.*,TIME AS community_time_key,community.province AS community_province,community.city AS community_city,community.district AS community_district,community.area AS community_area,community.`name` AS community_name,community.lng AS community_lng,community.lat AS community_lat,community.logo AS community_logo FROM (house,(SELECT DATE_FORMAT(deal_date, '%Y-%m') AS TIME, GROUP_CONCAT(house.id ORDER BY house.id DESC) AS ids FROM house WHERE`house`.`communityId` = " + id + " GROUP BY TIME) AS b) LEFT JOIN`community` `community` ON`community`.`id` = `house`.`communityId` WHERE FIND_IN_SET(house.id, b.ids) ";
+        // const sql = "SELECT house.*,TIME AS community_time_key,community.province AS community_province,community.city AS community_city,community.district AS community_district,community.area AS community_area,community.`name` AS community_name,community.lng AS community_lng,community.lat AS community_lat,community.logo AS community_logo FROM (house,(SELECT DATE_FORMAT(deal_date, '%Y-%m') AS TIME, GROUP_CONCAT(house.id ORDER BY house.id DESC) AS ids FROM house WHERE`house`.`communityId` = " + id + " GROUP BY TIME) AS b) LEFT JOIN`community` `community` ON`community`.`id` = `house`.`communityId` WHERE FIND_IN_SET(house.id, b.ids) ";
+
+        // Chatgpt 版本一
+        // const sql = "SELECT house.*, DATE_FORMAT(deal_date, '%Y-%m') AS community_time_key, community.province AS community_province , community.city AS community_city, community.district AS community_district, community.area AS community_area, community.`name` AS community_name, community.lng AS community_lng , community.lat AS community_lat, community.logo AS community_logo FROM house LEFT JOIN `community` `community` ON `community`.`id` = `house`.`communityId` WHERE `house`.`communityId` = 1 ORDER BY deal_date DESC;";
+
+        // Chatgpt 版本二
+        const sql = "SELECT h.*, DATE_FORMAT(h.deal_date, '%Y-%m') AS community_time_key, c.province AS community_province, c.city AS community_city, c.district AS community_district, c.area AS community_area, c.name AS community_name, c.lng AS community_lng , c.lat AS community_lat, c.logo AS community_logo FROM house h LEFT JOIN community c ON h.communityId = c.id WHERE h.communityId = " + id +" ORDER BY h.id DESC;";
 
         const res = await getManager().query(sql);
 
@@ -173,7 +179,7 @@ export default class TrendController {
     public static async getAllAreaAmount(ctx: Context): Promise<void> {
         // const { city = "杭州", area = "武林", step = 3 } = ctx.query;
 
-        const sql = "SELECT house.*,b.area AS community_area,b.district AS community_district,b.city AS community_city,b.province AS community_province FROM (house,( SELECT community.province, community.city, community.district, community.area, GROUP_CONCAT(DISTINCT id ORDER BY id ASC) AS ids FROM community GROUP BY community.area) AS b) WHERE FIND_IN_SET(house.communityId, b.ids) ";
+        const sql = "SELECT c.province AS community_province,c.district AS community_district,c.area AS community_area,c.city AS community_city,COUNT(h.communityId) AS trad_count FROM community c INNER JOIN house h ON c.id=h.communityId GROUP BY c.area";
 
         const res = await getManager().query(sql);
 
