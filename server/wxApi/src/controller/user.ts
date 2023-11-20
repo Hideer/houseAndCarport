@@ -1,8 +1,10 @@
 import { Context } from "koa";
+import https from "https";
 import { getManager, Repository, Not, Equal, Like } from "typeorm";
 import { validate, ValidationError } from "class-validator";
 import { request, summary, path, body, responsesAll, tagsAll } from "koa-swagger-decorator";
 import { User, userSchema } from "../entity/user";
+import { WXBizDataCrypt } from "./../utils/wx";
 
 @responsesAll({ 200: { description: "success"}, 400: { description: "bad request"}, 401: { description: "unauthorized, missing/wrong jwt token"}})
 @tagsAll(["User"])
@@ -23,153 +25,34 @@ export default class UserController {
         ctx.body = users;
     }
 
-    @request("get", "/users/{id}")
-    @summary("Find user by id")
-    @path({
-        id: { type: "number", required: true, description: "id of user" }
-    })
-    public static async getUser(ctx: Context): Promise<void> {
+    @request("post", "/signin_wx")
+    @summary("微信小程序鉴权登录")
+    public static async signinWx(ctx: Context): Promise<void> {
+        const params = ctx.params;
+        const encryptedData = params.encryptedData; // 获取小程序传来的encryptedData
+        const iv = params.iv; // 获取小程序传来的iv
+        const code = params.code;
+        const appid = "xxxxxxx"; // 自己小程序后台管理的appid，可登录小程序后台查看
+        const secret = "xxxxxxx"; // 小程序后台管理的secret，可登录小程序后台查看
+        const grant_type = "authorization_code"; // 授权（必填）默认值
 
-        // get a user repository to perform operations with user
-        const userRepository: Repository<User> = getManager().getRepository(User);
+        //请求获取openid
+        const url = "https://api.weixin.qq.com/sns/jscode2session?grant_type=" + grant_type + "&appid=" + appid + "&secret=" + secret + "&js_code=" + code;
 
-        // load user by id
-        const user: User | undefined = await userRepository.findOne(+ctx.params.id || 0);
+        let openid, sessionKey;
 
-        if (user) {
-            // return OK status code and loaded user object
-            ctx.status = 200;
-            ctx.body = user;
-        } else {
-            // return a BAD REQUEST status code and error message
-            ctx.status = 400;
-            ctx.body = "The user you are trying to retrieve doesn't exist in the db";
-        }
-
-    }
-
-    @request("post", "/users")
-    @summary("Create a user")
-    @body(userSchema)
-    public static async createUser(ctx: Context): Promise<void> {
-
-        // get a user repository to perform operations with user
-        const userRepository: Repository<User> = getManager().getRepository(User);
-
-        // build up entity user to be saved
-        const userToBeSaved: User = new User();
-        userToBeSaved.name = "name";
-        userToBeSaved.email = "email";
-
-        // validate user entity
-        const errors: ValidationError[] = await validate(userToBeSaved); // errors is an array of validation errors
-
-        if (errors.length > 0) {
-            // return BAD REQUEST status code and errors array
-            ctx.status = 400;
-            ctx.body = errors;
-        } else if (await userRepository.findOne({ email: userToBeSaved.email })) {
-            // return BAD REQUEST status code and email already exists error
-            ctx.status = 400;
-            ctx.body = "The specified e-mail address already exists";
-        } else {
-            // save the user contained in the POST body
-            const user = await userRepository.save(userToBeSaved);
-            // return CREATED status code and updated user
-            ctx.status = 201;
-            ctx.body = user;
-        }
-    }
-
-    @request("put", "/users/{id}")
-    @summary("Update a user")
-    @path({
-        id: { type: "number", required: true, description: "id of user" }
-    })
-    @body(userSchema)
-    public static async updateUser(ctx: Context): Promise<void> {
-
-        // get a user repository to perform operations with user
-        const userRepository: Repository<User> = getManager().getRepository(User);
-
-        // update the user by specified id
-        // build up entity user to be updated
-        const userToBeUpdated: User = new User();
-        userToBeUpdated.id = +ctx.params.id || 0; // will always have a number, this will avoid errors
-        userToBeUpdated.name = "name";
-        userToBeUpdated.email = "email";
-
-        // validate user entity
-        const errors: ValidationError[] = await validate(userToBeUpdated); // errors is an array of validation errors
-
-        if (errors.length > 0) {
-            // return BAD REQUEST status code and errors array
-            ctx.status = 400;
-            ctx.body = errors;
-        } else if (!await userRepository.findOne(userToBeUpdated.id)) {
-            // check if a user with the specified id exists
-            // return a BAD REQUEST status code and error message
-            ctx.status = 400;
-            ctx.body = "The user you are trying to update doesn't exist in the db";
-        } else if (await userRepository.findOne({ id: Not(Equal(userToBeUpdated.id)), email: userToBeUpdated.email })) {
-            // return BAD REQUEST status code and email already exists error
-            ctx.status = 400;
-            ctx.body = "The specified e-mail address already exists";
-        } else {
-            // save the user contained in the PUT body
-            const user = await userRepository.save(userToBeUpdated);
-            // return CREATED status code and updated user
-            ctx.status = 201;
-            ctx.body = user;
-        }
+        https.get(url, (res) => {
+            res.on("data", (d) => {
+                console.log("返回的信息: ", JSON.parse(d));
+                openid = JSON.parse(d).openid; // 得到openid
+                sessionKey = JSON.parse(d).session_key; // 得到session_key
+                const pc = new WXBizDataCrypt({ appId:appid, sessionKey }); // 这里的sessionKey 是上面获取到的
+                const decodeData = pc.decryptData(encryptedData, iv); // encryptedData 是从小程序获取到的
+                console.log("解密后 data: ", decodeData);
+            }).on("error", (e) => {
+                console.error(e);
+            });
+        });
 
     }
-
-    @request("delete", "/users/{id}")
-    @summary("Delete user by id")
-    @path({
-        id: { type: "number", required: true, description: "id of user" }
-    })
-    public static async deleteUser(ctx: Context): Promise<void> {
-
-        // get a user repository to perform operations with user
-        const userRepository = getManager().getRepository(User);
-
-        // find the user by specified id
-        const userToRemove: User | undefined = await userRepository.findOne(+ctx.params.id || 0);
-        if (!userToRemove) {
-            // return a BAD REQUEST status code and error message
-            ctx.status = 400;
-            ctx.body = "The user you are trying to delete doesn't exist in the db";
-        } else if (ctx.state.user.email !== userToRemove.email) {
-            // check user's token id and user id are the same
-            // if not, return a FORBIDDEN status code and error message
-            ctx.status = 403;
-            ctx.body = "A user can only be deleted by himself";
-        } else {
-            // the user is there so can be removed
-            await userRepository.remove(userToRemove);
-            // return a NO CONTENT status code
-            ctx.status = 204;
-        }
-
-    }
-
-    @request("delete", "/testusers")
-    @summary("Delete users generated by integration and load tests")
-    public static async deleteTestUsers(ctx: Context): Promise<void> {
-
-        // get a user repository to perform operations with user
-        const userRepository = getManager().getRepository(User);
-
-        // find test users
-        const usersToRemove: User[] = await userRepository.find({ where: { email: Like("%@citest.com")} });
-
-        // the user is there so can be removed
-        await userRepository.remove(usersToRemove);
-
-        // return a NO CONTENT status code
-        ctx.status = 204;
-    }
-
 }
